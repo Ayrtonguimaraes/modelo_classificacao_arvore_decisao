@@ -8,21 +8,214 @@ from plotly.subplots import make_subplots
 # Configuração da página
 st.set_page_config(
     page_title="Classificador de Segmento de Vendas",
-    page_icon="📊",
+    page_icon="🎯",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Título e descrição
-st.title("🎯 Classificador de Segmento de Vendas")
-st.markdown("---")
-st.markdown("**Análise inteligente para classificação de clientes em diferentes segmentos de mercado**")
+# CSS personalizado para design moderno
+st.markdown("""
+<style>
+    /* Reset e configurações gerais */
+    .main {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 0;
+    }
+    
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        max-width: 1200px;
+    }
+    
+    /* Header personalizado */
+    .header-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .header-title {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 3rem;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 0.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header-subtitle {
+        text-align: center;
+        color: #666;
+        font-size: 1.2rem;
+        font-weight: 300;
+        margin-bottom: 1rem;
+    }
+    
+    /* Cards modernos */
+    .card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 1rem 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Botões modernos */
+    .stButton > button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    /* Sidebar moderno */
+    .css-1d391kg {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Segmento badges */
+    .segment-badge {
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-size: 2rem;
+        font-weight: bold;
+        text-align: center;
+        margin: 1rem 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        animation: pulse 2s infinite;
+    }
+    
+    .segment-starter {
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        color: #000;
+    }
+    
+    .segment-bronze {
+        background: linear-gradient(135deg, #cd7f32 0%, #daa520 100%);
+        color: #fff;
+    }
+    
+    .segment-silver {
+        background: linear-gradient(135deg, #c0c0c0 0%, #e5e4e2 100%);
+        color: #000;
+    }
+    
+    .segment-gold {
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        color: #000;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    /* Métricas modernas */
+    .metric-container {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin: 0.5rem 0;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Formulário moderno */
+    .stSelectbox, .stNumberInput, .stSlider {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        border: 2px solid rgba(102, 126, 234, 0.2);
+    }
+    
+    .stSelectbox:focus, .stNumberInput:focus, .stSlider:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    /* Loading spinner personalizado */
+    .loading-container {
+        text-align: center;
+        padding: 3rem;
+    }
+    
+    .spinner {
+        border: 4px solid rgba(102, 126, 234, 0.1);
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Footer moderno */
+    .footer {
+        text-align: center;
+        padding: 2rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .header-title {
+            font-size: 2rem;
+        }
+        
+        .card {
+            padding: 1rem;
+        }
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Header moderno
+st.markdown("""
+<div class="header-container">
+    <div class="header-title">🎯 Classificador de Segmento de Vendas</div>
+    <div class="header-subtitle">Análise inteligente para classificação de clientes em diferentes segmentos de mercado</div>
+</div>
+""", unsafe_allow_html=True)
 
 # Carregar o modelo
 @st.cache_resource
 def load_model():
     try:
-        modelo = joblib.load('./modelo_classificacao_decision_tree.pkl')
+        modelo = joblib.load('./models/modelo_classificacao_decision_tree.pkl')
         return modelo
     except Exception as e:
         st.error(f"Erro ao carregar o modelo: {e}")
@@ -30,29 +223,39 @@ def load_model():
 
 modelo = load_model()
 
-# Sidebar com informações
+# Sidebar moderno com informações
 with st.sidebar:
-    st.header("ℹ️ Sobre o Projeto")
     st.markdown("""
-    Este classificador utiliza um modelo de **Árvore de Decisão** treinado para categorizar empresas em 4 segmentos:
+    <div style="background: rgba(255, 255, 255, 0.95); padding: 1.5rem; border-radius: 15px; margin-bottom: 1rem;">
+        <h3 style="color: #667eea; margin-bottom: 1rem;">ℹ️ Sobre o Projeto</h3>
+        <p style="font-size: 0.9rem; line-height: 1.6;">
+        Este classificador utiliza um modelo de <strong>Árvore de Decisão</strong> treinado para categorizar empresas em 4 segmentos:
+        </p>
+        <ul style="font-size: 0.9rem; line-height: 1.8;">
+            <li>🟡 <strong>Starter</strong>: Empresas iniciantes</li>
+            <li>🟤 <strong>Bronze</strong>: Empresas em crescimento</li>
+            <li>⚪ <strong>Silver</strong>: Empresas estabelecidas</li>
+            <li>🟡 <strong>Gold</strong>: Empresas premium</li>
+        </ul>
+        <p style="font-size: 0.9rem; margin-top: 1rem;">
+        <strong>Acurácia do modelo</strong>: ~47%
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    - 🟡 **Starter**: Empresas iniciantes
-    - 🟤 **Bronze**: Empresas em crescimento  
-    - ⚪ **Silver**: Empresas estabelecidas
-    - 🟡 **Gold**: Empresas premium
-    
-    **Acurácia do modelo**: ~47%
-    """)
-    
-    st.header("📈 Variáveis Analisadas")
     st.markdown("""
-    - Atividade Econômica
-    - Faturamento Mensal
-    - Número de Funcionários
-    - Localização
-    - Idade da Empresa
-    - Nível de Inovação
-    """)
+    <div style="background: rgba(255, 255, 255, 0.95); padding: 1.5rem; border-radius: 15px;">
+        <h3 style="color: #667eea; margin-bottom: 1rem;">📈 Variáveis Analisadas</h3>
+        <ul style="font-size: 0.9rem; line-height: 1.8;">
+            <li>🏢 Atividade Econômica</li>
+            <li>💰 Faturamento Mensal</li>
+            <li>👥 Número de Funcionários</li>
+            <li>📍 Localização</li>
+            <li>📅 Idade da Empresa</li>
+            <li>💡 Nível de Inovação</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
 
 # Função para fazer predição
 def predict_segment(data):
@@ -80,7 +283,10 @@ def predict_segment(data):
 col1, col2 = st.columns([2, 1])
 
 with col1:
-    st.header("📝 Dados da Empresa")
+    st.markdown("""
+    <div class="card">
+        <h2 style="color: #667eea; margin-bottom: 1.5rem;">📝 Dados da Empresa</h2>
+    """, unsafe_allow_html=True)
     
     # Formulário
     with st.form("prediction_form"):
@@ -131,6 +337,8 @@ with col1:
             )
         
         submitted = st.form_submit_button("🎯 Classificar Segmento", use_container_width=True)
+    
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # Processar predição
 if submitted:
@@ -146,8 +354,16 @@ if submitted:
         'inovacao': inovacao
     }
     
-    # Fazer predição
-    with st.spinner("🔍 Analisando dados da empresa..."):
+    # Fazer predição com loading moderno
+    with st.spinner(""):
+        st.markdown("""
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <h3 style="color: #667eea;">🔍 Analisando dados da empresa...</h3>
+            <p style="color: #666;">Processando informações com inteligência artificial</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
         predicao, probabilidades = predict_segment(data)
     
     if predicao and probabilidades:
@@ -155,7 +371,10 @@ if submitted:
         col_result1, col_result2 = st.columns([1, 2])
         
         with col_result1:
-            st.subheader("🎯 Segmento Classificado")
+            st.markdown("""
+            <div class="card">
+                <h3 style="color: #667eea; text-align: center; margin-bottom: 1.5rem;">🎯 Segmento Classificado</h3>
+            """, unsafe_allow_html=True)
             
             # Cores para cada segmento
             cores = {
@@ -165,26 +384,22 @@ if submitted:
                 'Gold': '#FFD700'
             }
             
-            # Exibir resultado com estilo
+            # Exibir resultado com estilo moderno
             st.markdown(f"""
-            <div style="
-                background: {cores.get(predicao, '#007bff')};
-                color: {'#000' if predicao in ['Starter', 'Silver', 'Gold'] else '#fff'};
-                padding: 20px;
-                border-radius: 10px;
-                text-align: center;
-                font-size: 24px;
-                font-weight: bold;
-                margin: 10px 0;
-            ">
+            <div class="segment-badge segment-{predicao.lower()}">
                 {predicao}
             </div>
             """, unsafe_allow_html=True)
+            
+            st.markdown("</div>", unsafe_allow_html=True)
         
         with col_result2:
-            st.subheader("📊 Probabilidades por Segmento")
+            st.markdown("""
+            <div class="card">
+                <h3 style="color: #667eea; margin-bottom: 1.5rem;">📊 Probabilidades por Segmento</h3>
+            """, unsafe_allow_html=True)
             
-            # Criar gráfico de barras
+            # Criar gráfico de barras moderno
             fig = px.bar(
                 x=list(probabilidades.keys()),
                 y=list(probabilidades.values()),
@@ -198,33 +413,85 @@ if submitted:
                 xaxis_title="Segmento",
                 yaxis_title="Probabilidade",
                 showlegend=False,
-                height=400
+                height=400,
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font=dict(size=14),
+                title_font_size=18
             )
             
-            fig.update_traces(textposition='outside')
+            fig.update_traces(
+                textposition='outside',
+                marker_line_color='rgba(255,255,255,0.8)',
+                marker_line_width=2
+            )
+            
             st.plotly_chart(fig, use_container_width=True)
+            
+            st.markdown("</div>", unsafe_allow_html=True)
         
         # Detalhes da análise
         st.markdown("---")
-        st.subheader("📋 Resumo da Análise")
+        st.markdown("""
+        <div class="card">
+            <h3 style="color: #667eea; margin-bottom: 1.5rem;">📋 Resumo da Análise</h3>
+        """, unsafe_allow_html=True)
         
         col_detail1, col_detail2, col_detail3 = st.columns(3)
         
         with col_detail1:
-            st.metric("Faturamento Mensal", f"R$ {faturamento_mensal:,.2f}")
-            st.metric("Funcionários", numero_funcionarios)
+            st.markdown(f"""
+            <div class="metric-container">
+                <h4 style="color: #667eea; margin-bottom: 0.5rem;">💰 Faturamento Mensal</h4>
+                <p style="font-size: 1.5rem; font-weight: bold; color: #333;">R$ {faturamento_mensal:,.2f}</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown(f"""
+            <div class="metric-container">
+                <h4 style="color: #667eea; margin-bottom: 0.5rem;">👥 Funcionários</h4>
+                <p style="font-size: 1.5rem; font-weight: bold; color: #333;">{numero_funcionarios}</p>
+            </div>
+            """, unsafe_allow_html=True)
         
         with col_detail2:
-            st.metric("Idade da Empresa", f"{idade} anos")
-            st.metric("Nível de Inovação", f"{inovacao}/10")
+            st.markdown(f"""
+            <div class="metric-container">
+                <h4 style="color: #667eea; margin-bottom: 0.5rem;">📅 Idade da Empresa</h4>
+                <p style="font-size: 1.5rem; font-weight: bold; color: #333;">{idade} anos</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown(f"""
+            <div class="metric-container">
+                <h4 style="color: #667eea; margin-bottom: 0.5rem;">💡 Nível de Inovação</h4>
+                <p style="font-size: 1.5rem; font-weight: bold; color: #333;">{inovacao}/10</p>
+            </div>
+            """, unsafe_allow_html=True)
         
         with col_detail3:
-            st.metric("Atividade", atividade_economica)
-            st.metric("Localização", localizacao)
+            st.markdown(f"""
+            <div class="metric-container">
+                <h4 style="color: #667eea; margin-bottom: 0.5rem;">🏢 Atividade</h4>
+                <p style="font-size: 1.5rem; font-weight: bold; color: #333;">{atividade_economica}</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown(f"""
+            <div class="metric-container">
+                <h4 style="color: #667eea; margin-bottom: 0.5rem;">📍 Localização</h4>
+                <p style="font-size: 1.5rem; font-weight: bold; color: #333;">{localizacao}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("</div>", unsafe_allow_html=True)
         
         # Gráfico de radar para visualizar características
         st.markdown("---")
-        st.subheader("📈 Perfil da Empresa")
+        st.markdown("""
+        <div class="card">
+            <h3 style="color: #667eea; margin-bottom: 1.5rem;">📈 Perfil da Empresa</h3>
+        """, unsafe_allow_html=True)
         
         # Normalizar valores para o gráfico de radar
         faturamento_norm = min(faturamento_mensal / 2000000, 1.0)  # Normalizar até 2M
@@ -247,18 +514,30 @@ if submitted:
             polar=dict(
                 radialaxis=dict(
                     visible=True,
-                    range=[0, 1]
-                )),
+                    range=[0, 1],
+                    tickfont=dict(size=12),
+                    gridcolor='rgba(102, 126, 234, 0.2)'
+                ),
+                angularaxis=dict(
+                    tickfont=dict(size=14, color='#333')
+                ),
+                bgcolor='rgba(255, 255, 255, 0.8)'
+            ),
             showlegend=False,
-            height=400
+            height=500,
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)'
         )
         
         st.plotly_chart(fig_radar, use_container_width=True)
+        
+        st.markdown("</div>", unsafe_allow_html=True)
 
-# Footer
+# Footer moderno
 st.markdown("---")
 st.markdown("""
-<div style="text-align: center; color: #666;">
-    <p>Desenvolvido com ❤️ usando Streamlit | Modelo de Machine Learning: Árvore de Decisão</p>
+<div class="footer">
+    <p>🚀 Desenvolvido com ❤️ usando Streamlit | 🤖 Modelo de Machine Learning: Árvore de Decisão</p>
+    <p style="font-size: 0.8rem; margin-top: 0.5rem;">© 2024 Classificador de Segmento de Vendas</p>
 </div>
 """, unsafe_allow_html=True) 
