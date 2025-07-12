@@ -110,7 +110,6 @@ st.markdown("""
         text-align: center;
         margin: 1rem 0;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        animation: pulse 2s infinite;
     }
     
     .segment-starter {
@@ -133,11 +132,7 @@ st.markdown("""
         color: #000;
     }
     
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
-    }
+
     
     /* Métricas modernas */
     .metric-container {
@@ -161,26 +156,7 @@ st.markdown("""
         box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
     }
     
-    /* Loading spinner personalizado */
-    .loading-container {
-        text-align: center;
-        padding: 3rem;
-    }
-    
-    .spinner {
-        border: 4px solid rgba(102, 126, 234, 0.1);
-        border-top: 4px solid #667eea;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 1rem;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
+
     
     /* Footer moderno */
     .footer {
@@ -219,9 +195,15 @@ def load_model():
         return modelo
     except Exception as e:
         st.error(f"Erro ao carregar o modelo: {e}")
+        st.info("Verifique se o arquivo do modelo existe na pasta 'models/'")
         return None
 
 modelo = load_model()
+
+# Verificar se o modelo foi carregado
+if modelo is None:
+    st.error("❌ Não foi possível carregar o modelo. Verifique se o arquivo 'modelo_classificacao_decision_tree.pkl' existe na pasta 'models/'")
+    st.stop()
 
 # Sidebar moderno com informações
 with st.sidebar:
@@ -354,16 +336,8 @@ if submitted:
         'inovacao': inovacao
     }
     
-    # Fazer predição com loading moderno
-    with st.spinner(""):
-        st.markdown("""
-        <div class="loading-container">
-            <div class="spinner"></div>
-            <h3 style="color: #667eea;">🔍 Analisando dados da empresa...</h3>
-            <p style="color: #666;">Processando informações com inteligência artificial</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
+    # Fazer predição
+    with st.spinner("🔍 Analisando dados da empresa..."):
         predicao, probabilidades = predict_segment(data)
     
     if predicao and probabilidades:
