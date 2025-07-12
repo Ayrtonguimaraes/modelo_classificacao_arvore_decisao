@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classificador de Segmento de Vendas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 2rem auto;
+            max-width: 800px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+        }
+        
+        .form-container {
+            padding: 2rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-predict {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .result-container {
+            display: none;
+            margin-top: 2rem;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .segment-badge {
+            font-size: 1.2rem;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+        
+        .segment-starter { background-color: #ffc107; color: #000; }
+        .segment-bronze { background-color: #cd7f32; color: #fff; }
+        .segment-silver { background-color: #c0c0c0; color: #000; }
+        .segment-gold { background-color: #ffd700; color: #000; }
+        
+        .probability-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #e9ecef;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+        
+        .probability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.8s ease;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            border: 1px solid #f5c6cb;
+        }
+
+        .demo-notice {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <div class="header">
+                <h1><i class="fas fa-chart-line me-3"></i>Classificador de Segmento de Vendas</h1>
+                <p class="mb-0">Análise inteligente para classificação de clientes</p>
+            </div>
+            
+            <div class="form-container">
+                <div class="demo-notice">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Demo Estático:</strong> Esta é uma versão de demonstração que simula as predições baseadas em regras de negócio.
+                </div>
+
+                <form id="predictionForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="atividade_economica" class="form-label">
+                                <i class="fas fa-building me-2"></i>Atividade Econômica
+                            </label>
+                            <select class="form-select" id="atividade_economica" name="atividade_economica" required>
+                                <option value="">Selecione uma atividade</option>
+                                <option value="Comércio">Comércio</option>
+                                <option value="Indústria">Indústria</option>
+                                <option value="Agronegócio">Agronegócio</option>
+                                <option value="Serviços">Serviços</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="localizacao" class="form-label">
+                                <i class="fas fa-map-marker-alt me-2"></i>Localização
+                            </label>
+                            <select class="form-select" id="localizacao" name="localizacao" required>
+                                <option value="">Selecione uma localização</option>
+                                <option value="São Paulo">São Paulo</option>
+                                <option value="Rio de Janeiro">Rio de Janeiro</option>
+                                <option value="Belo Horizonte">Belo Horizonte</option>
+                                <option value="Vitória">Vitória</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="faturamento_mensal" class="form-label">
+                                <i class="fas fa-dollar-sign me-2"></i>Faturamento Mensal (R$)
+                            </label>
+                            <input type="number" class="form-control" id="faturamento_mensal" 
+                                   name="faturamento_mensal" step="0.01" min="0" required
+                                   placeholder="Ex: 1000000.00">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="numero_de_funcionarios" class="form-label">
+                                <i class="fas fa-users me-2"></i>Número de Funcionários
+                            </label>
+                            <input type="number" class="form-control" id="numero_de_funcionarios" 
+                                   name="numero_de_funcionarios" min="1" required
+                                   placeholder="Ex: 15">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="idade" class="form-label">
+                                <i class="fas fa-calendar-alt me-2"></i>Idade da Empresa (anos)
+                            </label>
+                            <input type="number" class="form-control" id="idade" 
+                                   name="idade" min="0" required
+                                   placeholder="Ex: 10">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="inovacao" class="form-label">
+                                <i class="fas fa-lightbulb me-2"></i>Nível de Inovação (0-10)
+                            </label>
+                            <input type="number" class="form-control" id="inovacao" 
+                                   name="inovacao" min="0" max="10" required
+                                   placeholder="Ex: 7">
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-predict btn-lg text-white">
+                            <i class="fas fa-magic me-2"></i>Classificar Segmento
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Analisando dados da empresa...</p>
+                </div>
+                
+                <div class="error-message" id="errorMessage"></div>
+                
+                <div class="result-container" id="resultContainer">
+                    <h3 class="text-center mb-4">
+                        <i class="fas fa-trophy me-2"></i>Resultado da Classificação
+                    </h3>
+                    
+                    <div class="text-center mb-4">
+                        <h4>Segmento Classificado:</h4>
+                        <span class="segment-badge" id="segmentBadge"></span>
+                    </div>
+                    
+                    <h5 class="mb-3">Probabilidades por Segmento:</h5>
+                    <div id="probabilitiesContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Função para simular predição baseada em regras de negócio
+        function predictSegment(data) {
+            const faturamento = parseFloat(data.faturamento_mensal);
+            const funcionarios = parseInt(data.numero_de_funcionarios);
+            const idade = parseInt(data.idade);
+            const inovacao = parseInt(data.inovacao);
+            
+            // Regras de classificação baseadas no modelo treinado
+            let score = 0;
+            
+            // Faturamento (peso: 40%)
+            if (faturamento < 500000) score += 0;
+            else if (faturamento < 1000000) score += 1;
+            else if (faturamento < 1500000) score += 2;
+            else score += 3;
+            
+            // Número de funcionários (peso: 20%)
+            if (funcionarios < 10) score += 0;
+            else if (funcionarios < 15) score += 1;
+            else score += 2;
+            
+            // Idade da empresa (peso: 20%)
+            if (idade < 5) score += 0;
+            else if (idade < 10) score += 1;
+            else score += 2;
+            
+            // Nível de inovação (peso: 20%)
+            if (inovacao < 3) score += 0;
+            else if (inovacao < 6) score += 1;
+            else score += 2;
+            
+            // Determinar segmento baseado no score
+            let segmento;
+            let probabilidades = { 'Starter': 0, 'Bronze': 0, 'Silver': 0, 'Gold': 0 };
+            
+            if (score <= 2) {
+                segmento = 'Starter';
+                probabilidades = { 'Starter': 0.7, 'Bronze': 0.2, 'Silver': 0.08, 'Gold': 0.02 };
+            } else if (score <= 4) {
+                segmento = 'Bronze';
+                probabilidades = { 'Starter': 0.15, 'Bronze': 0.6, 'Silver': 0.2, 'Gold': 0.05 };
+            } else if (score <= 6) {
+                segmento = 'Silver';
+                probabilidades = { 'Starter': 0.05, 'Bronze': 0.2, 'Silver': 0.6, 'Gold': 0.15 };
+            } else {
+                segmento = 'Gold';
+                probabilidades = { 'Starter': 0.02, 'Bronze': 0.08, 'Silver': 0.2, 'Gold': 0.7 };
+            }
+            
+            return { segmento, probabilidades };
+        }
+
+        document.getElementById('predictionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Mostrar loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultContainer').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+            
+            // Coletar dados do formulário
+            const formData = {
+                atividade_economica: document.getElementById('atividade_economica').value,
+                faturamento_mensal: document.getElementById('faturamento_mensal').value,
+                numero_de_funcionarios: document.getElementById('numero_de_funcionarios').value,
+                localizacao: document.getElementById('localizacao').value,
+                idade: document.getElementById('idade').value,
+                inovacao: document.getElementById('inovacao').value
+            };
+            
+            try {
+                // Simular delay de processamento
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Fazer predição
+                const result = predictSegment(formData);
+                
+                // Exibir resultado
+                const segmentBadge = document.getElementById('segmentBadge');
+                segmentBadge.textContent = result.segmento;
+                segmentBadge.className = `segment-badge segment-${result.segmento.toLowerCase()}`;
+                
+                // Exibir probabilidades
+                const probContainer = document.getElementById('probabilitiesContainer');
+                probContainer.innerHTML = '';
+                
+                Object.entries(result.probabilidades).forEach(([segmento, probabilidade]) => {
+                    const percentage = (probabilidade * 100).toFixed(1);
+                    const probHtml = `
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">${segmento}</span>
+                                <span>${percentage}%</span>
+                            </div>
+                            <div class="probability-bar">
+                                <div class="probability-fill" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                    `;
+                    probContainer.innerHTML += probHtml;
+                });
+                
+                document.getElementById('resultContainer').style.display = 'block';
+                
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = 
+                    'Erro ao processar a classificação: ' + error.message;
+                document.getElementById('errorMessage').style.display = 'block';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 

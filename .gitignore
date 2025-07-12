@@ -52,6 +52,9 @@ Thumbs.db
 # Model files (opcional - você pode querer incluir o modelo treinado)
 # *.pkl
 
+# Netlify
+.netlify/
+
 # Logs
 *.log
 
